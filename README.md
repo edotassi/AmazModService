@@ -5,7 +5,7 @@
 After connecting the clock and installing adb on the pc, execute these commands in the terminal:
 ```bash
 adb root
-adb remonut
+adb remount
 adb push AmazModService.apk /system/priv-app
 adb reboot
  ```
