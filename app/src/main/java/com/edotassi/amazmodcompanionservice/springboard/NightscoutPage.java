@@ -25,6 +25,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -120,15 +121,15 @@ public class NightscoutPage extends AbstractPlugin {
                 sgv.setText(nightscoutDataEvent.getSgv());
             }
             sgv.setTextColor(Color.WHITE);
-            if (nightscoutDataEvent.getSgv() < 65) {sgv.setTextColor(Color.RED);}
+            if (nightscoutDataEvent.getSgv() < 80) {sgv.setTextColor(Color.RED);}
             if (nightscoutDataEvent.getSgv() > 180) {sgv.setTextColor(Color.RED);}
         }
 
         if (delta != null) {
             if (nightscoutDataEvent.getDelta() > 0) {
-                delta.setText("+" + String.valueOf(nightscoutDataEvent.getDelta()) + " mg/dl");
+                delta.setText("+" + String.valueOf(String.format(Locale.ENGLISH,"%.1f", nightscoutDataEvent.getDelta())) + " mg/dl");
             } else {
-                delta.setText(String.valueOf(nightscoutDataEvent.getDelta()) + " mg/dl");
+                delta.setText(String.valueOf(String.format(Locale.ENGLISH,"%.1f", nightscoutDataEvent.getDelta())) + " mg/dl");
             }
         }
 
