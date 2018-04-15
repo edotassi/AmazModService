@@ -3,6 +3,7 @@ package com.edotassi.amazmodcompanionservice.springboard;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -47,15 +48,15 @@ public class NightscoutPage extends AbstractPlugin {
     private boolean eventBusConnected;
     private long lastDate;
 
-    private Map<String, String> directionsIcons = new HashMap<String, String>() {{
-        put("DoubleUp", "{gmd_arrow_upward}{gmd_arrow_upward}");
-        put("SingleUp", "{gmd_arrow_upward}");
-        put("FortyFiveUp", "{gmd_trending_up}");
-        put("Flat", "{gmd_trending_flat}");
-        put("FortyFiveDown", "{gmd_trending_down}");
-        put("SingleDown", "{gmd_arrow_downward}");
-        put("DoubleDown", "{gmd_arrow_downward}{gmd_arrow_downward}");
-    }};
+    //private Map<String, String> directionsIcons = new HashMap<String, String>() {{
+      //  put("DoubleUp", "{gmd_arrow_upward}{gmd_arrow_upward}");
+        //put("SingleUp", "{gmd_arrow_upward}");
+        //put("FortyFiveUp", "{gmd_trending_up}");
+        //put("Flat", "{gmd_trending_flat}");
+        //put("FortyFiveDown", "{gmd_trending_down}");
+        //put("SingleDown", "{gmd_arrow_downward}");
+        //put("DoubleDown", "{gmd_arrow_downward}{gmd_arrow_downward}");
+    //}};
 
     @BindView(R2.id.nightscout_sgv_textview)
     TextView sgv;
@@ -63,8 +64,9 @@ public class NightscoutPage extends AbstractPlugin {
     TextView date;
     @BindView(R2.id.nightscout_delta_text_view)
     TextView delta;
-    @BindView(R2.id.nightscout_direction_textview)
-    IconicsTextView direction;
+
+   // @BindView(R2.id.nightscout_direction_textview)
+    //IconicsTextView direction;
 
     //Much like a fragment, getView returns the content view of the page. You can set up your layout here
     @Override
@@ -100,19 +102,49 @@ public class NightscoutPage extends AbstractPlugin {
         lastDate = nightscoutDataEvent.getDate();
 
         if (sgv != null) {
-            sgv.setText(String.valueOf(nightscoutDataEvent.getSgv()));
+            if (nightscoutDataEvent.getDirection().equals("DoubleUp")) {
+                sgv.setText(nightscoutDataEvent.getSgv() + " ⇈");
+            } else if (nightscoutDataEvent.getDirection().equals("SingleUp")) {
+                sgv.setText(nightscoutDataEvent.getSgv() + " ↑");
+            } else if (nightscoutDataEvent.getDirection().equals("FortyFiveUp")) {
+                sgv.setText(nightscoutDataEvent.getSgv() + " ↗");
+            } else if (nightscoutDataEvent.getDirection().equals("Flat")) {
+                sgv.setText(nightscoutDataEvent.getSgv() + " →");
+            } else if (nightscoutDataEvent.getDirection().equals("FortyFiveDown")) {
+                sgv.setText(nightscoutDataEvent.getSgv() + " ↘");
+            } else if (nightscoutDataEvent.getDirection().equals("SingleDown")) {
+                sgv.setText(nightscoutDataEvent.getSgv() + " ↓");
+            } else if (nightscoutDataEvent.getDirection().equals("DoubleDown")) {
+                sgv.setText(nightscoutDataEvent.getSgv() + " ⇊");
+            } else {
+                sgv.setText(nightscoutDataEvent.getSgv());
+            }
+            sgv.setTextColor(Color.WHITE);
+            if (nightscoutDataEvent.getSgv() < 65) {sgv.setTextColor(Color.RED);}
+            if (nightscoutDataEvent.getSgv() > 180) {sgv.setTextColor(Color.RED);}
         }
+
         if (delta != null) {
-            delta.setText(String.valueOf(nightscoutDataEvent.getDelta()));
+            if (nightscoutDataEvent.getDelta() > 0) {
+                delta.setText("+" + String.valueOf(nightscoutDataEvent.getDelta()) + " mg/dl");
+            } else {
+                delta.setText(String.valueOf(nightscoutDataEvent.getDelta()) + " mg/dl");
+            }
         }
+
+
+
         if (date != null) {
-            date.setText(TimeAgo.using(nightscoutDataEvent.getDate()));
+                date.setText(TimeAgo.using(nightscoutDataEvent.getDate()));
         }
-        if (direction != null) {
-            String directionText = directionsIcons.get(nightscoutDataEvent.getDirection());
-            direction.setText(directionText == null ? "{gmd_help_outline}" : directionText);
-        }
+            //if (direction != null) {
+            //   String directionText = directionsIcons.get(nightscoutDataEvent.getDirection());
+            //   direction.setText(directionText == null ? "{gmd_help_outline}" : directionText);
+            //
     }
+
+
+
 
     //Return the icon for this page, used when the page is disabled in the app list. In this case, the launcher icon is used
     @Override
@@ -161,6 +193,7 @@ public class NightscoutPage extends AbstractPlugin {
 
     private void refreshView() {
         //Called when the page reloads, check for updates here if you need to
+        HermesEventBus.getDefault().post(new NightscoutRequestSyncEvent());
     }
 
     //Returns the springboard host
