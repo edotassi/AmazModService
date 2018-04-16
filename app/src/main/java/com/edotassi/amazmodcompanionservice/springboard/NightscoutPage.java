@@ -110,7 +110,7 @@ public class NightscoutPage extends AbstractPlugin {
 
         lastDate = nightscoutDataEvent.getDate();
         lastSgv = String.valueOf(nightscoutDataEvent.getSgv());
-        lastDirection = String.valueOf(nightscoutDataEvent.getSgv());
+        lastDirection = String.valueOf(nightscoutDataEvent.getDirection());
         lastDelta = nightscoutDataEvent.getDelta();
 
         if (sgv != null) {
