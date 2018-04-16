@@ -48,6 +48,12 @@ public class NightscoutPage extends AbstractPlugin {
 
     private boolean eventBusConnected;
     private long lastDate;
+    private String lastDirection;
+    private String trendArrow;
+    private String lastSgv;
+    private float lastDelta;
+
+
 
     //private Map<String, String> directionsIcons = new HashMap<String, String>() {{
       //  put("DoubleUp", "{gmd_arrow_upward}{gmd_arrow_upward}");
@@ -100,50 +106,51 @@ public class NightscoutPage extends AbstractPlugin {
     public void updateData(NightscoutDataEvent nightscoutDataEvent) {
         Log.d(Constants.TAG_NIGHTSCOUT_PAGE, "NightscoutDataEvent received");
 
+// getting the data from Hermes
+
         lastDate = nightscoutDataEvent.getDate();
+        lastSgv = String.valueOf(nightscoutDataEvent.getSgv());
+        lastDirection = String.valueOf(nightscoutDataEvent.getSgv());
+        lastDelta = nightscoutDataEvent.getDelta();
 
         if (sgv != null) {
-            if (nightscoutDataEvent.getDirection().equals("DoubleUp")) {
-                sgv.setText(nightscoutDataEvent.getSgv() + " ⇈");
-            } else if (nightscoutDataEvent.getDirection().equals("SingleUp")) {
-                sgv.setText(nightscoutDataEvent.getSgv() + " ↑");
-            } else if (nightscoutDataEvent.getDirection().equals("FortyFiveUp")) {
-                sgv.setText(nightscoutDataEvent.getSgv() + " ↗");
-            } else if (nightscoutDataEvent.getDirection().equals("Flat")) {
-                sgv.setText(nightscoutDataEvent.getSgv() + " →");
-            } else if (nightscoutDataEvent.getDirection().equals("FortyFiveDown")) {
-                sgv.setText(nightscoutDataEvent.getSgv() + " ↘");
-            } else if (nightscoutDataEvent.getDirection().equals("SingleDown")) {
-                sgv.setText(nightscoutDataEvent.getSgv() + " ↓");
-            } else if (nightscoutDataEvent.getDirection().equals("DoubleDown")) {
-                sgv.setText(nightscoutDataEvent.getSgv() + " ⇊");
+            if (lastDirection.equals("DoubleUp")) {
+                trendArrow= " ⇈";
+            } else if (lastDirection.equals("SingleUp")) {
+                trendArrow= " ↑";
+            } else if (lastDirection.equals("FortyFiveUp")) {
+                trendArrow= " ↗";
+            } else if (lastDirection.equals("Flat")) {
+                trendArrow= " →";
+            } else if (lastDirection.equals("FortyFiveDown")) {
+                trendArrow= " ↘";
+            } else if (lastDirection.equals("SingleDown")) {
+                trendArrow= " ↓";
+            } else if (lastDirection.equals("DoubleDown")) {
+                trendArrow= " ⇊";
             } else {
-                sgv.setText(nightscoutDataEvent.getSgv());
+                trendArrow= "";
             }
+            sgv.setText(lastSgv+trendArrow);
+
             sgv.setTextColor(Color.WHITE);
-            if (nightscoutDataEvent.getSgv() < 80) {sgv.setTextColor(Color.RED);}
-            if (nightscoutDataEvent.getSgv() > 180) {sgv.setTextColor(Color.RED);}
+            if (Integer.valueOf(lastSgv) < 80) {sgv.setTextColor(Color.RED);}
+            if (Integer.valueOf(lastSgv) > 180) {sgv.setTextColor(Color.RED);}
         }
 
         if (delta != null) {
             if (nightscoutDataEvent.getDelta() > 0) {
-                delta.setText("+" + String.valueOf(String.format(Locale.ENGLISH,"%.1f", nightscoutDataEvent.getDelta())) + " mg/dl");
+                delta.setText("+" + String.valueOf(String.format(Locale.ENGLISH,"%.1f", lastDelta)) + " mg/dl");
             } else {
-                delta.setText(String.valueOf(String.format(Locale.ENGLISH,"%.1f", nightscoutDataEvent.getDelta())) + " mg/dl");
+                delta.setText(String.valueOf(String.format(Locale.ENGLISH,"%.1f", lastDelta)) + " mg/dl");
             }
         }
-
-
 
         if (date != null) {
                 date.setText(TimeAgo.using(nightscoutDataEvent.getDate()));
         }
-            //if (direction != null) {
-            //   String directionText = directionsIcons.get(nightscoutDataEvent.getDirection());
-            //   direction.setText(directionText == null ? "{gmd_help_outline}" : directionText);
-            //
-    }
 
+    }
 
 
 
@@ -194,6 +201,7 @@ public class NightscoutPage extends AbstractPlugin {
 
     private void refreshView() {
         //Called when the page reloads, check for updates here if you need to
+        //Done :-) now it gets updated every time we enter the widget
         HermesEventBus.getDefault().post(new NightscoutRequestSyncEvent());
     }
 
