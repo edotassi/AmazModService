@@ -114,6 +114,8 @@ public class NightscoutPage extends AbstractPlugin {
         lastDelta = nightscoutDataEvent.getDelta();
 
         if (sgv != null) {
+
+            trendArrow= "";
             if (lastDirection.equals("DoubleUp")) {
                 trendArrow= " ⇈";
             } else if (lastDirection.equals("SingleUp")) {
@@ -128,9 +130,8 @@ public class NightscoutPage extends AbstractPlugin {
                 trendArrow= " ↓";
             } else if (lastDirection.equals("DoubleDown")) {
                 trendArrow= " ⇊";
-            } else {
-                trendArrow= "";
             }
+
             sgv.setText(lastSgv+trendArrow);
 
             sgv.setTextColor(Color.WHITE);
@@ -139,7 +140,7 @@ public class NightscoutPage extends AbstractPlugin {
         }
 
         if (delta != null) {
-            if (nightscoutDataEvent.getDelta() > 0) {
+            if (lastDelta > 0) {
                 delta.setText("+" + String.valueOf(String.format(Locale.ENGLISH,"%.1f", lastDelta)) + " mg/dl");
             } else {
                 delta.setText(String.valueOf(String.format(Locale.ENGLISH,"%.1f", lastDelta)) + " mg/dl");
