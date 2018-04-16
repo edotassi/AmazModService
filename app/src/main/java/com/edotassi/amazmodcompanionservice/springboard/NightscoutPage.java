@@ -3,6 +3,7 @@ package com.edotassi.amazmodcompanionservice.springboard;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +25,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -46,16 +48,22 @@ public class NightscoutPage extends AbstractPlugin {
 
     private boolean eventBusConnected;
     private long lastDate;
+    private String lastDirection;
+    private String trendArrow;
+    private String lastSgv;
+    private float lastDelta;
 
-    private Map<String, String> directionsIcons = new HashMap<String, String>() {{
-        put("DoubleUp", "{gmd_arrow_upward}{gmd_arrow_upward}");
-        put("SingleUp", "{gmd_arrow_upward}");
-        put("FortyFiveUp", "{gmd_trending_up}");
-        put("Flat", "{gmd_trending_flat}");
-        put("FortyFiveDown", "{gmd_trending_down}");
-        put("SingleDown", "{gmd_arrow_downward}");
-        put("DoubleDown", "{gmd_arrow_downward}{gmd_arrow_downward}");
-    }};
+
+
+    //private Map<String, String> directionsIcons = new HashMap<String, String>() {{
+      //  put("DoubleUp", "{gmd_arrow_upward}{gmd_arrow_upward}");
+        //put("SingleUp", "{gmd_arrow_upward}");
+        //put("FortyFiveUp", "{gmd_trending_up}");
+        //put("Flat", "{gmd_trending_flat}");
+        //put("FortyFiveDown", "{gmd_trending_down}");
+        //put("SingleDown", "{gmd_arrow_downward}");
+        //put("DoubleDown", "{gmd_arrow_downward}{gmd_arrow_downward}");
+    //}};
 
     @BindView(R2.id.nightscout_sgv_textview)
     TextView sgv;
@@ -63,8 +71,9 @@ public class NightscoutPage extends AbstractPlugin {
     TextView date;
     @BindView(R2.id.nightscout_delta_text_view)
     TextView delta;
-    @BindView(R2.id.nightscout_direction_textview)
-    IconicsTextView direction;
+
+   // @BindView(R2.id.nightscout_direction_textview)
+    //IconicsTextView direction;
 
     //Much like a fragment, getView returns the content view of the page. You can set up your layout here
     @Override
@@ -97,22 +106,54 @@ public class NightscoutPage extends AbstractPlugin {
     public void updateData(NightscoutDataEvent nightscoutDataEvent) {
         Log.d(Constants.TAG_NIGHTSCOUT_PAGE, "NightscoutDataEvent received");
 
+// getting the data from Hermes
+
         lastDate = nightscoutDataEvent.getDate();
+        lastSgv = String.valueOf(nightscoutDataEvent.getSgv());
+        lastDirection = String.valueOf(nightscoutDataEvent.getDirection());
+        lastDelta = nightscoutDataEvent.getDelta();
 
         if (sgv != null) {
-            sgv.setText(String.valueOf(nightscoutDataEvent.getSgv()));
+
+            trendArrow= "";
+            if (lastDirection.equals("DoubleUp")) {
+                trendArrow= " ⇈";
+            } else if (lastDirection.equals("SingleUp")) {
+                trendArrow= " ↑";
+            } else if (lastDirection.equals("FortyFiveUp")) {
+                trendArrow= " ↗";
+            } else if (lastDirection.equals("Flat")) {
+                trendArrow= " →";
+            } else if (lastDirection.equals("FortyFiveDown")) {
+                trendArrow= " ↘";
+            } else if (lastDirection.equals("SingleDown")) {
+                trendArrow= " ↓";
+            } else if (lastDirection.equals("DoubleDown")) {
+                trendArrow= " ⇊";
+            }
+
+            sgv.setText(lastSgv+trendArrow);
+
+            sgv.setTextColor(Color.WHITE);
+            if (Integer.valueOf(lastSgv) < 80) {sgv.setTextColor(Color.RED);}
+            if (Integer.valueOf(lastSgv) > 180) {sgv.setTextColor(Color.RED);}
         }
+
         if (delta != null) {
-            delta.setText(String.valueOf(nightscoutDataEvent.getDelta()));
+            if (lastDelta > 0) {
+                delta.setText("+" + String.valueOf(String.format(Locale.ENGLISH,"%.1f", lastDelta)) + " mg/dl");
+            } else {
+                delta.setText(String.valueOf(String.format(Locale.ENGLISH,"%.1f", lastDelta)) + " mg/dl");
+            }
         }
+
         if (date != null) {
-            date.setText(TimeAgo.using(nightscoutDataEvent.getDate()));
+                date.setText(TimeAgo.using(nightscoutDataEvent.getDate()));
         }
-        if (direction != null) {
-            String directionText = directionsIcons.get(nightscoutDataEvent.getDirection());
-            direction.setText(directionText == null ? "{gmd_help_outline}" : directionText);
-        }
+
     }
+
+
 
     //Return the icon for this page, used when the page is disabled in the app list. In this case, the launcher icon is used
     @Override
@@ -161,6 +202,8 @@ public class NightscoutPage extends AbstractPlugin {
 
     private void refreshView() {
         //Called when the page reloads, check for updates here if you need to
+        //Done :-) now it gets updated every time we enter the widget
+        HermesEventBus.getDefault().post(new NightscoutRequestSyncEvent());
     }
 
     //Returns the springboard host
