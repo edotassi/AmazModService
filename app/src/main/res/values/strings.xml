@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">AmazmodCompanionService</string>
+    <string name="app_name">AmazModService</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_notification">NotificationActivity</string>
 </resources>

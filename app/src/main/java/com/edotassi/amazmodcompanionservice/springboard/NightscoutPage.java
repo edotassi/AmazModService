@@ -75,7 +75,6 @@ public class NightscoutPage extends AbstractPlugin {
    // @BindView(R2.id.nightscout_direction_textview)
     //IconicsTextView direction;
 
-    //Much like a fragment, getView returns the content view of the page. You can set up your layout here
     @Override
     public View getView(Context paramContext) {
         mContext = paramContext;
@@ -86,7 +85,6 @@ public class NightscoutPage extends AbstractPlugin {
 
         mView = LayoutInflater.from(paramContext).inflate(R.layout.nightscoout_page, null);
 
-        //nightscoutPageViewHolder = new NightscoutPageViewHolder();
         try {
             ButterKnife.bind(this, mView);
         } catch (Exception ex) {
