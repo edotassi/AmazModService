@@ -2,12 +2,17 @@ package com.edotassi.amazmodcompanionservice;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.edotassi.amazmodcompanionservice.events.NightscoutDataEvent;
 import com.edotassi.amazmodcompanionservice.events.NightscoutRequestSyncEvent;
+import com.edotassi.amazmodcompanionservice.notifications.NotificationService;
+import com.edotassi.amazmodcompanionservice.notifications.NotificationsReceiver;
 import com.huami.watch.transport.DataBundle;
 import com.huami.watch.transport.TransportDataItem;
 import com.huami.watch.transport.Transporter;
@@ -30,6 +35,11 @@ import xiaofei.library.hermeseventbus.HermesEventBus;
 public class MainService extends Service implements Transporter.ChannelListener, Transporter.ServiceConnectionListener {
 
     private Transporter companionTransporter;
+    private Transporter notificationsTransporter;
+
+    private NotificationsReceiver notificationsReceiver;
+
+    private NotificationService notificationManager;
 
     private Map<String, Class> messages = new HashMap<String, Class>() {{
         put(Constants.ACTION_NIGHTSCOUT_SYNC, NightscoutDataEvent.class);
@@ -41,6 +51,16 @@ public class MainService extends Service implements Transporter.ChannelListener,
 
         HermesEventBus.getDefault().init(this);
         HermesEventBus.getDefault().register(this);
+
+        notificationManager = new NotificationService(this);
+
+        notificationsReceiver = new NotificationsReceiver();
+
+        /*
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("reply");
+        LocalBroadcastManager.getInstance(this).registerReceiver(notificationsReceiver, intentFilter);
+        */
     }
 
     @Nullable
@@ -111,6 +131,25 @@ public class MainService extends Service implements Transporter.ChannelListener,
             Log.d(Constants.TAG, "connecting companionTransporter to transportService");
             companionTransporter.connectTransportService();
         }
+
+        notificationsTransporter = TransporterClassic.get(this, Constants.TRANSPORTER_MODULE_NOTIFICATIONS);
+        notificationsTransporter.addChannelListener(this);
+        notificationsTransporter.addServiceConnectionListener(this);
+        notificationsTransporter.addDataListener(new Transporter.DataListener() {
+            @Override
+            public void onDataReceived(TransportDataItem transportDataItem) {
+                String action = transportDataItem.getAction();
+                Log.d(Constants.TAG, "action: " + action + ", module: " + transportDataItem.getModuleName());
+
+                if ((action != null) && (action.equals("add"))) {
+                    notificationManager.add(transportDataItem);
+                }
+            }
+        });
+
+        if (!notificationsTransporter.isTransportServiceConnected()) {
+            notificationsTransporter.connectTransportService();
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -118,5 +157,20 @@ public class MainService extends Service implements Transporter.ChannelListener,
         Log.d(Constants.TAG, "requested nightscout sync");
 
         companionTransporter.send(Constants.ACTION_NIGHTSCOUT_SYNC, new DataBundle());
+    }
+
+    @Override
+    public void onServiceConnected(Bundle bundle) {
+
+    }
+
+    @Override
+    public void onServiceConnectionFailed(Transporter.ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onServiceDisconnected(Transporter.ConnectionResult connectionResult) {
+
     }
 }

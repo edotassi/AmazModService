@@ -1,10 +1,12 @@
 package android.support.v7.app;
 
 /**
- * @deprecated
+ * Created by edoardotassinari on 20/04/18.
  */
-@Deprecated
+
+/*
+ * @deprecated
+ * https://github.com/elemers/HermesEventBus/issues/49
+ */
 public class ActionBarActivity extends AppCompatActivity {
-    public ActionBarActivity() {
-    }
 }
