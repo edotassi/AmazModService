@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.edotassi.amazmodcompanionservice"
+
     android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 
     <application
         android:allowBackup="true"
@@ -12,6 +18,35 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme">
+
+        <activity android:name="android.support.v7.app.ActionBarActivity" />
+        <activity
+            android:name=".ui.NotificationActivity"
+            android:allowEmbedded="true"
+            android:exported="true"
+            android:label="@string/title_activity_notification"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Transparent">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.TextInputActivity"
+            android:allowEmbedded="true"
+            android:exported="true"
+            android:label="@string/title_activity_notification"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Transparent">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <receiver
             android:name=".BootReceiver"
             android:enabled="true"
@@ -40,13 +75,8 @@
         <meta-data
             android:name="com.huami.watch.launcher.springboard.PASSAGER_TARGET"
             android:resource="@array/spring_depend" />
-
-        <activity android:name="android.support.v7.app.ActionBarActivity" />
-
-        <activity
-            android:name=".ui.NotificationActivity"
-            android:label="@string/title_activity_notification"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <meta-data
+            android:name="com.google.android.wearable.standalone"
+            android:value="true" />
     </application>
-
 </manifest>

@@ -19,14 +19,11 @@ import com.edotassi.amazmodcompanionservice.events.NightscoutDataEvent;
 import com.edotassi.amazmodcompanionservice.events.NightscoutRequestSyncEvent;
 import com.github.marlonlom.utilities.timeago.TimeAgo;
 import com.mikepenz.iconics.Iconics;
-import com.mikepenz.iconics.view.IconicsTextView;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

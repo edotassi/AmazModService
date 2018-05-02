@@ -91,6 +91,8 @@ public class NotificationService {
         byte[] byteArray = stream.toByteArray();
         intent.putExtra("image", byteArray);
 
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+
         context.startActivity(intent);
         /*
         Bitmap background = ((BitmapDrawable) context.getResources().getDrawable(R.drawable.lau_notify_icon_upgrade_bg)).getBitmap();
