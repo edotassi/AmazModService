@@ -2,9 +2,10 @@ package com.edotassi.amazmodcompanionservice.ui;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 import com.edotassi.amazmodcompanionservice.R;
 import com.edotassi.amazmodcompanionservice.R2;
+import com.edotassi.amazmodcompanionservice.notifications.NotificationSpec;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,6 +28,10 @@ public class NotificationActivity extends Activity {
     TextView text;
     @BindView(R2.id.notification_icon)
     ImageView icon;
+
+    private Handler handler;
+
+    private NotificationSpec notificationSpec;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +48,25 @@ public class NotificationActivity extends Activity {
 
         Intent intent = getIntent();
 
-        if (intent != null) {
-            extractDataFromIntent(intent);
+        notificationSpec = intent.getExtras().getParcelable(NotificationSpec.EXTRA);
+
+        title.setText(notificationSpec.getTitle());
+        text.setText(notificationSpec.getText());
+        icon.setImageBitmap(notificationSpec.getIcon());
+
+        if (notificationSpec.isDeviceLocked()) {
+            handler = new Handler();
+
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    finish();
+                }
+            }, notificationSpec.getTimeoutRelock());
+        }
+
+        if (notificationSpec.getVibration() > 0) {
+            Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            vibrator.vibrate(notificationSpec.getVibration());
         }
     }
 
@@ -61,19 +84,5 @@ public class NotificationActivity extends Activity {
     @OnClick(R2.id.activity_notification_button_reply)
     public void clickReply() {
         Toast.makeText(this, "not_implented", Toast.LENGTH_SHORT).show();
-    }
-
-    private void extractDataFromIntent(Intent intent) {
-        String titleExtra = intent.getStringExtra("title");
-        String textExtra = intent.getStringExtra("text");
-
-        title.setText(titleExtra);
-        text.setText(textExtra);
-
-        byte[] byteArray = getIntent().getByteArrayExtra("image");
-        if (byteArray != null) {
-            Bitmap bitmapExtra = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-            icon.setImageBitmap(Bitmap.createScaledBitmap(bitmapExtra, 48, 48, false));
-        }
     }
 }

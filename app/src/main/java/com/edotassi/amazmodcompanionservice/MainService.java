@@ -12,6 +12,8 @@ import android.util.Log;
 import com.edotassi.amazmodcompanionservice.events.NightscoutDataEvent;
 import com.edotassi.amazmodcompanionservice.events.NightscoutRequestSyncEvent;
 import com.edotassi.amazmodcompanionservice.notifications.NotificationService;
+import com.edotassi.amazmodcompanionservice.notifications.NotificationSpec;
+import com.edotassi.amazmodcompanionservice.notifications.NotificationSpecFactory;
 import com.edotassi.amazmodcompanionservice.notifications.NotificationsReceiver;
 import com.huami.watch.transport.DataBundle;
 import com.huami.watch.transport.TransportDataItem;
@@ -142,7 +144,12 @@ public class MainService extends Service implements Transporter.ChannelListener,
                 Log.d(Constants.TAG, "action: " + action + ", module: " + transportDataItem.getModuleName());
 
                 if ((action != null) && (action.equals("add"))) {
-                    notificationManager.add(transportDataItem);
+                    NotificationSpec notificationSpec = NotificationSpecFactory.getNotificationSpec(MainService.this, transportDataItem);
+                    if (notificationSpec != null) {
+                        notificationManager.post(notificationSpec);
+                    } else {
+                        //TODO warn about notification null
+                    }
                 }
             }
         });
@@ -161,16 +168,13 @@ public class MainService extends Service implements Transporter.ChannelListener,
 
     @Override
     public void onServiceConnected(Bundle bundle) {
-
     }
 
     @Override
     public void onServiceConnectionFailed(Transporter.ConnectionResult connectionResult) {
-
     }
 
     @Override
     public void onServiceDisconnected(Transporter.ConnectionResult connectionResult) {
-
     }
 }

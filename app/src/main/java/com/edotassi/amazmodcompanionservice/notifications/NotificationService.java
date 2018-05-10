@@ -1,19 +1,13 @@
 package com.edotassi.amazmodcompanionservice.notifications;
 
+
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Vibrator;
-import android.util.Log;
-
-import com.edotassi.amazmodcompanionservice.Constants;
+import android.support.v4.app.NotificationCompat;
 import com.edotassi.amazmodcompanionservice.ui.NotificationActivity;
-import com.huami.watch.notification.data.StatusBarNotificationData;
-import com.huami.watch.transport.DataBundle;
-import com.huami.watch.transport.TransportDataItem;
-
-import java.io.ByteArrayOutputStream;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static android.content.Context.VIBRATOR_SERVICE;
@@ -35,6 +29,37 @@ public class NotificationService {
         notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
     }
 
+    public void post(NotificationSpec notificationSpec) {
+        if (notificationSpec.isEnableCutomUI()) {
+            postWithCustomUI(notificationSpec);
+        } else {
+            postWithStandardUI(notificationSpec);
+        }
+    }
+
+    private void postWithCustomUI(NotificationSpec notificationSpec) {
+        Intent intent = new Intent(context, NotificationActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        intent.putExtras(NotificationSpecFactory.toBundle(notificationSpec));
+
+        context.startActivity(intent);
+    }
+
+    private void postWithStandardUI(NotificationSpec notificationSpec) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "")
+                .setSmallIcon(android.R.drawable.ic_dialog_email)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setStyle(new NotificationCompat.InboxStyle())
+                .setContentText(notificationSpec.getText())
+                .setContentTitle(notificationSpec.getTitle())
+                .setVibrate(new long[]{notificationSpec.getVibration()});
+
+        Notification notification = builder.build();
+        notificationManager.notify(notificationSpec.getId(), notification);
+    }
+
+    /*
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
     public void add(TransportDataItem transportDataItem) {
         DataBundle dataBundle = transportDataItem.getData();
         StatusBarNotificationData statusBarNotificationData = dataBundle.getParcelable("data");
@@ -76,24 +101,7 @@ public class NotificationService {
         */
 
 
-        String title = statusBarNotificationData.notification.title;
-        String text = statusBarNotificationData.notification.text;
-        Bitmap icon = statusBarNotificationData.notification.smallIcon;
 
-
-        Intent intent = new Intent(context, NotificationActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("title", title);
-        intent.putExtra("text", text);
-
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        icon.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        byte[] byteArray = stream.toByteArray();
-        intent.putExtra("image", byteArray);
-
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-
-        context.startActivity(intent);
         /*
         Bitmap background = ((BitmapDrawable) context.getResources().getDrawable(R.drawable.lau_notify_icon_upgrade_bg)).getBitmap();
 
@@ -130,6 +138,7 @@ public class NotificationService {
         notification1.flags = 32;
 
         notificationManager.notify(statusBarNotificationData.id, notification1);
-        */
+
     }
+    */
 }
