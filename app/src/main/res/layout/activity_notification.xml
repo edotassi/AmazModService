@@ -23,9 +23,10 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentStart="true"
+                android:layout_below="@+id/notification_text"
                 android:layout_marginStart="106dp"
                 android:background="#00ffffff"
-                android:gravity="left"
+                android:gravity="left|center_vertical"
                 android:paddingBottom="20dp"
                 android:paddingLeft="10dp"
                 android:paddingTop="20dp"
@@ -38,11 +39,10 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentStart="true"
+                android:layout_below="@+id/notification_text"
                 android:background="#00ffffff"
-                android:gravity="right"
-                android:paddingBottom="20dp"
-                android:paddingRight="10dp"
-                android:paddingTop="20dp"
+                android:gravity="right|center_vertical"
+                android:padding="10dp"
                 android:text="Close"
                 android:textColor="@color/text" />
 
@@ -54,6 +54,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:gravity="center_vertical|center_horizontal"
+                android:minHeight="90dp"
                 android:text="text"
                 android:textAlignment="center"
                 android:textColor="@color/text" />
@@ -61,7 +62,7 @@
             <TextView
                 android:id="@+id/notification_title"
                 android:layout_width="match_parent"
-                android:layout_height="34dp"
+                android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/notification_icon"
                 android:gravity="center_vertical|center_horizontal"

@@ -27,7 +27,7 @@ public class NotificationSpecFactory {
             return null;
         }
 
-        notificationSpec.setVibration(500);
+        notificationSpec.setVibration(100);
         notificationSpec.setTimeoutRelock(15 * 1000);
         notificationSpec.setDeviceLocked(DeviceUtil.isDeviceLocked(context));
         notificationSpec.setEnableCutomUI(dataBundle.getBoolean("enableCustomUI", true));

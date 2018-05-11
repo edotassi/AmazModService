@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.edotassi.amazmodcompanionservice.R;
 import com.edotassi.amazmodcompanionservice.R2;
 import com.edotassi.amazmodcompanionservice.notifications.NotificationSpec;
+import com.edotassi.amazmodcompanionservice.support.ActivityFinishRunnable;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,6 +30,7 @@ public class NotificationActivity extends Activity {
     ImageView icon;
 
     private Handler handler;
+    private ActivityFinishRunnable activityFinishRunnable;
 
     private NotificationSpec notificationSpec;
 
@@ -54,12 +56,9 @@ public class NotificationActivity extends Activity {
         icon.setImageBitmap(notificationSpec.getIcon());
 
         handler = new Handler();
+        activityFinishRunnable = new ActivityFinishRunnable(this);
 
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                finish();
-            }
-        }, notificationSpec.getTimeoutRelock());
+        startTimerFinish();
 
         if (notificationSpec.getVibration() > 0) {
             Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -70,6 +69,9 @@ public class NotificationActivity extends Activity {
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         findViewById(R.id.notification_root_layout).dispatchTouchEvent(event);
+
+        startTimerFinish();
+
         return false;
     }
 
@@ -81,5 +83,10 @@ public class NotificationActivity extends Activity {
     @OnClick(R2.id.activity_notification_button_reply)
     public void clickReply() {
         Toast.makeText(this, "not_implented", Toast.LENGTH_SHORT).show();
+    }
+
+    private void startTimerFinish() {
+        handler.removeCallbacks(activityFinishRunnable);
+        handler.postDelayed(activityFinishRunnable, notificationSpec.getTimeoutRelock());
     }
 }
