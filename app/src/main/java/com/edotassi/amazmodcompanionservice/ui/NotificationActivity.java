@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.MotionEvent;
 import android.view.WindowManager;
@@ -54,15 +53,13 @@ public class NotificationActivity extends Activity {
         text.setText(notificationSpec.getText());
         icon.setImageBitmap(notificationSpec.getIcon());
 
-        if (notificationSpec.isDeviceLocked()) {
-            handler = new Handler();
+        handler = new Handler();
 
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    finish();
-                }
-            }, notificationSpec.getTimeoutRelock());
-        }
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                finish();
+            }
+        }, notificationSpec.getTimeoutRelock());
 
         if (notificationSpec.getVibration() > 0) {
             Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);

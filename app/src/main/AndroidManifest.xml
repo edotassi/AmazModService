@@ -25,7 +25,6 @@
             android:allowEmbedded="true"
             android:exported="true"
             android:label="@string/title_activity_notification"
-            android:launchMode="singleTask"
             android:taskAffinity=""
             android:theme="@style/Theme.Transparent">
             <intent-filter>
@@ -38,8 +37,6 @@
             android:allowEmbedded="true"
             android:exported="true"
             android:label="@string/title_activity_notification"
-            android:launchMode="singleTask"
-            android:taskAffinity=""
             android:theme="@style/Theme.Transparent">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

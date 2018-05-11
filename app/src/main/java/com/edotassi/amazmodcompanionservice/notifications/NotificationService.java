@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
+
 import com.edotassi.amazmodcompanionservice.ui.NotificationActivity;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
@@ -39,7 +40,10 @@ public class NotificationService {
 
     private void postWithCustomUI(NotificationSpec notificationSpec) {
         Intent intent = new Intent(context, NotificationActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         intent.putExtras(NotificationSpecFactory.toBundle(notificationSpec));
 
         context.startActivity(intent);

@@ -19,62 +19,65 @@
 
             <Button
                 android:id="@+id/activity_notification_button_reply"
-                android:layout_width="90dp"
+                android:layout_width="107dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentStart="true"
-                android:layout_marginStart="125dp"
-                android:background="@color/white"
+                android:layout_marginStart="106dp"
+                android:background="#00ffffff"
                 android:gravity="left"
                 android:paddingBottom="20dp"
                 android:paddingLeft="10dp"
                 android:paddingTop="20dp"
-                android:text="Reply" />
+                android:text="Keep"
+                android:textColor="@color/text" />
 
             <Button
                 android:id="@+id/activity_notification_button_close"
-                android:layout_width="90dp"
+                android:layout_width="106dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentStart="true"
-                android:background="@color/white"
+                android:background="#00ffffff"
                 android:gravity="right"
                 android:paddingBottom="20dp"
                 android:paddingRight="10dp"
                 android:paddingTop="20dp"
-                android:text="Close" />
+                android:text="Close"
+                android:textColor="@color/text" />
 
             <TextView
                 android:id="@+id/notification_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/notification_title"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:gravity="center_vertical|center_horizontal"
                 android:text="text"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:textColor="@color/text" />
 
             <TextView
                 android:id="@+id/notification_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/notification_text"
-                android:layout_alignParentEnd="true"
+                android:layout_width="match_parent"
+                android:layout_height="34dp"
                 android:layout_alignParentStart="true"
-                android:layout_marginBottom="19dp"
+                android:layout_below="@+id/notification_icon"
                 android:gravity="center_vertical|center_horizontal"
                 android:paddingLeft="20px"
                 android:paddingRight="20px"
                 android:text="TextView"
+                android:textColor="@color/text"
                 android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/notification_icon"
-                android:layout_width="48px"
-                android:layout_height="48px"
+                android:layout_width="43dp"
+                android:layout_height="43dp"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="15dp"
+                android:padding="5dp"
                 app:srcCompat="@color/white" />
         </RelativeLayout>
     </ScrollView>
