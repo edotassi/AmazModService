@@ -6,19 +6,29 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.edotassi.amazmodcompanionservice.Constants;
 import com.edotassi.amazmodcompanionservice.R;
 import com.edotassi.amazmodcompanionservice.R2;
+import com.edotassi.amazmodcompanionservice.events.ReplyNotificationEvent;
 import com.edotassi.amazmodcompanionservice.notifications.NotificationSpec;
+import com.edotassi.amazmodcompanionservice.settings.SettingsManager;
 import com.edotassi.amazmodcompanionservice.support.ActivityFinishRunnable;
+
+import java.util.Arrays;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import xiaofei.library.hermeseventbus.HermesEventBus;
 
 public class NotificationActivity extends Activity {
 
@@ -28,6 +38,8 @@ public class NotificationActivity extends Activity {
     TextView text;
     @BindView(R2.id.notification_icon)
     ImageView icon;
+    @BindView(R2.id.notification_replies_container)
+    LinearLayout repliesContainer;
 
     private Handler handler;
     private ActivityFinishRunnable activityFinishRunnable;
@@ -64,6 +76,29 @@ public class NotificationActivity extends Activity {
             Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
             vibrator.vibrate(notificationSpec.getVibration());
         }
+
+        SettingsManager settingsManager = new SettingsManager(this);
+        final String replies = settingsManager.getString(Constants.PREF_NOTIFICATION_CUSTOM_REPLIES, "");
+
+        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        List<String> repliesList = Arrays.asList(replies == null ? new String[]{} : replies.split(","));
+        for (final String reply : repliesList) {
+            Button button = new Button(this);
+            button.setLayoutParams(param);
+            button.setText(reply);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    HermesEventBus.getDefault().post(new ReplyNotificationEvent(notificationSpec.getKey(), reply));
+                    finish();
+                }
+            });
+
+            repliesContainer.addView(button);
+        }
     }
 
     @Override
@@ -88,5 +123,11 @@ public class NotificationActivity extends Activity {
     private void startTimerFinish() {
         handler.removeCallbacks(activityFinishRunnable);
         handler.postDelayed(activityFinishRunnable, notificationSpec.getTimeoutRelock());
+    }
+
+    @Override
+    public void finish() {
+        handler.removeCallbacks(activityFinishRunnable);
+        super.finish();
     }
 }

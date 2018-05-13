@@ -31,11 +31,7 @@ public class NotificationService {
     }
 
     public void post(NotificationSpec notificationSpec) {
-        if (notificationSpec.isEnableCutomUI()) {
-            postWithCustomUI(notificationSpec);
-        } else {
-            postWithStandardUI(notificationSpec);
-        }
+        postWithCustomUI(notificationSpec);
     }
 
     private void postWithCustomUI(NotificationSpec notificationSpec) {

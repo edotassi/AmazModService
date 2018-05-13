@@ -11,10 +11,13 @@ import android.util.Log;
 
 import com.edotassi.amazmodcompanionservice.events.NightscoutDataEvent;
 import com.edotassi.amazmodcompanionservice.events.NightscoutRequestSyncEvent;
+import com.edotassi.amazmodcompanionservice.events.ReplyNotificationEvent;
+import com.edotassi.amazmodcompanionservice.events.SyncSettingsEvent;
 import com.edotassi.amazmodcompanionservice.notifications.NotificationService;
 import com.edotassi.amazmodcompanionservice.notifications.NotificationSpec;
 import com.edotassi.amazmodcompanionservice.notifications.NotificationSpecFactory;
 import com.edotassi.amazmodcompanionservice.notifications.NotificationsReceiver;
+import com.edotassi.amazmodcompanionservice.settings.SettingsManager;
 import com.huami.watch.transport.DataBundle;
 import com.huami.watch.transport.TransportDataItem;
 import com.huami.watch.transport.Transporter;
@@ -41,10 +44,12 @@ public class MainService extends Service implements Transporter.ChannelListener,
 
     private NotificationsReceiver notificationsReceiver;
 
+    private SettingsManager settingsManager;
     private NotificationService notificationManager;
 
     private Map<String, Class> messages = new HashMap<String, Class>() {{
         put(Constants.ACTION_NIGHTSCOUT_SYNC, NightscoutDataEvent.class);
+        put(Constants.ACTION_SETTINGS_SYNC, SyncSettingsEvent.class);
     }};
 
     @Override
@@ -55,14 +60,8 @@ public class MainService extends Service implements Transporter.ChannelListener,
         HermesEventBus.getDefault().register(this);
 
         notificationManager = new NotificationService(this);
-
         notificationsReceiver = new NotificationsReceiver();
-
-        /*
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("reply");
-        LocalBroadcastManager.getInstance(this).registerReceiver(notificationsReceiver, intentFilter);
-        */
+        settingsManager = new SettingsManager(this);
     }
 
     @Nullable
@@ -143,12 +142,19 @@ public class MainService extends Service implements Transporter.ChannelListener,
                 String action = transportDataItem.getAction();
                 Log.d(Constants.TAG, "action: " + action + ", module: " + transportDataItem.getModuleName());
 
-                if ((action != null) && (action.equals("add"))) {
-                    NotificationSpec notificationSpec = NotificationSpecFactory.getNotificationSpec(MainService.this, transportDataItem);
-                    if (notificationSpec != null) {
-                        notificationManager.post(notificationSpec);
-                    } else {
-                        //TODO warn about notification null
+                if (action == null) {
+                    return;
+                }
+
+                switch (action) {
+                    case "add": {
+                        NotificationSpec notificationSpec = NotificationSpecFactory.getNotificationSpec(MainService.this, transportDataItem);
+                        if (notificationSpec != null) {
+                            notificationManager.post(notificationSpec);
+                        } else {
+                            //TODO warn about notification null
+                        }
+                        break;
                     }
                 }
             }
@@ -157,13 +163,6 @@ public class MainService extends Service implements Transporter.ChannelListener,
         if (!notificationsTransporter.isTransportServiceConnected()) {
             notificationsTransporter.connectTransportService();
         }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void requestNightscoutSync(NightscoutRequestSyncEvent event) {
-        Log.d(Constants.TAG, "requested nightscout sync");
-
-        companionTransporter.send(Constants.ACTION_NIGHTSCOUT_SYNC, new DataBundle());
     }
 
     @Override
@@ -176,5 +175,32 @@ public class MainService extends Service implements Transporter.ChannelListener,
 
     @Override
     public void onServiceDisconnected(Transporter.ConnectionResult connectionResult) {
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void requestNightscoutSync(NightscoutRequestSyncEvent event) {
+        Log.d(Constants.TAG, "requested nightscout sync");
+        companionTransporter.send(Constants.ACTION_NIGHTSCOUT_SYNC, new DataBundle());
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void settingsSync(SyncSettingsEvent event) {
+        Log.d(Constants.TAG, "sync settings");
+        Log.d(Constants.TAG, "vibration: " + event.getNotificationVibration());
+        Log.d(Constants.TAG, "timeout: " + event.getNotificationScreenTimeout());
+        Log.d(Constants.TAG, "replies: " + event.getNotificationCustomReplies());
+
+        settingsManager.sync(event);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void reply(ReplyNotificationEvent event) {
+        Log.d(Constants.TAG, "reply to notification, key: " + event.getKey() + ", message: " + event.getMessage());
+
+        DataBundle dataBundle = new DataBundle();
+        dataBundle.putString("key", event.getKey());
+        dataBundle.putString("message", event.getMessage());
+
+        companionTransporter.send(Constants.ACTION_REPLY, dataBundle);
     }
 }

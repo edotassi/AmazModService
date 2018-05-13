@@ -8,36 +8,37 @@ public class NotificationSpec implements Parcelable {
 
     public static final String EXTRA = "notificationSpec";
 
+    private String key;
     private int id;
     private String title;
     private String text;
     private Bitmap icon;
     private int vibration;
-    private boolean enableCutomUI;
     private boolean isDeviceLocked;
     private int timeoutRelock;
 
-    public NotificationSpec() {}
+    public NotificationSpec() {
+    }
 
     protected NotificationSpec(Parcel in) {
+        key = in.readString();
         id = in.readInt();
         title = in.readString();
         text = in.readString();
         icon = in.readParcelable(Bitmap.class.getClassLoader());
         vibration = in.readInt();
-        enableCutomUI = in.readByte() != 0;
         isDeviceLocked = in.readByte() != 0;
         timeoutRelock = in.readInt();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(key);
         dest.writeInt(id);
         dest.writeString(title);
         dest.writeString(text);
         dest.writeParcelable(icon, flags);
         dest.writeInt(vibration);
-        dest.writeByte((byte) (enableCutomUI ? 1 : 0));
         dest.writeByte((byte) (isDeviceLocked ? 1 : 0));
         dest.writeInt(timeoutRelock);
     }
@@ -53,6 +54,15 @@ public class NotificationSpec implements Parcelable {
             return new NotificationSpec[size];
         }
     };
+
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
 
     public int getId() {
         return id;
@@ -84,14 +94,6 @@ public class NotificationSpec implements Parcelable {
 
     public void setIcon(Bitmap icon) {
         this.icon = icon;
-    }
-
-    public boolean isEnableCutomUI() {
-        return enableCutomUI;
-    }
-
-    public void setEnableCutomUI(boolean enableCutomUI) {
-        this.enableCutomUI = enableCutomUI;
     }
 
     public boolean isDeviceLocked() {

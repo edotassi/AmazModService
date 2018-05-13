@@ -2,7 +2,10 @@ package com.edotassi.amazmodcompanionservice.notifications;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.provider.Settings;
 
+import com.edotassi.amazmodcompanionservice.Constants;
+import com.edotassi.amazmodcompanionservice.settings.SettingsManager;
 import com.edotassi.amazmodcompanionservice.util.DeviceUtil;
 import com.huami.watch.notification.data.NotificationData;
 import com.huami.watch.notification.data.StatusBarNotificationData;
@@ -12,6 +15,8 @@ import com.huami.watch.transport.TransportDataItem;
 public class NotificationSpecFactory {
 
     public static NotificationSpec getNotificationSpec(Context context, TransportDataItem transportDataItem) {
+        SettingsManager settingsManager = new SettingsManager(context);
+
         DataBundle dataBundle = transportDataItem.getData();
         if (dataBundle == null) {
             return null;
@@ -27,10 +32,9 @@ public class NotificationSpecFactory {
             return null;
         }
 
-        notificationSpec.setVibration(100);
-        notificationSpec.setTimeoutRelock(15 * 1000);
+        notificationSpec.setVibration(settingsManager.getInt(Constants.PREF_NOTIFICATION_VIBRATION, Constants.PREF_DEFAULT_NOTIFICATION_VIBRATION));
+        notificationSpec.setTimeoutRelock(settingsManager.getInt(Constants.PREF_NOTIFICATION_SCREEN_TIMEOUT, Constants.PREF_DEFAULT_NOTIFICATION_SCREEN_TIMEOUT));
         notificationSpec.setDeviceLocked(DeviceUtil.isDeviceLocked(context));
-        notificationSpec.setEnableCutomUI(dataBundle.getBoolean("enableCustomUI", true));
 
         return notificationSpec;
     }
@@ -43,7 +47,7 @@ public class NotificationSpecFactory {
 
         NotificationSpec notificationSpec = new NotificationSpec();
 
-
+        notificationSpec.setKey(statusBarNotificationData.key);
         notificationSpec.setTitle(notificationData.title);
         notificationSpec.setText(notificationData.text);
         notificationSpec.setIcon(notificationData.smallIcon);
